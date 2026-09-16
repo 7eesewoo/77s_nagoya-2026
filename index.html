@@ -1,412 +1,165 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>2026 名古屋亞運觀賽隨身 App</title>
-  <style>
-    :root {
-      --primary: #1e3a8a;
-      --primary-light: #eff6ff;
-      --gold: #f59e0b;
-      --gold-bg: #fffbeb;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --subtext: #475569;
-      --border: #e2e8f0;
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      margin: 0;
-      padding: 0 0 80px 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-    }
-    header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-      color: white;
-      padding: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .header-title { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; justify-content: space-between; }
-    .header-sub { font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
-    
-    .view-content { padding: 12px; display: none; }
-    .view-content.active { display: block; }
-
-    .controls {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid var(--border);
-    }
-    .search-input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      outline: none;
-      background: #f1f5f9;
-    }
-    .search-input:focus { border-color: var(--primary); background: #fff; }
-    
-    .tags-slider {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      margin: 10px 0;
-      padding-bottom: 4px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tags-slider::-webkit-scrollbar { display: none; }
-    .chip {
-      white-space: nowrap;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--subtext);
-      cursor: pointer;
-    }
-    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: bold; }
-
-    .price-switch {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 6px;
-      border-top: 1px dashed var(--border);
-      font-size: 0.82rem;
-      color: var(--subtext);
-    }
-    .switch-btn-group { display: flex; gap: 4px; }
-    .switch-btn {
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: #fff;
-      font-size: 0.8rem;
-    }
-    .switch-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    }
-    .card.gold-border { border-left: 5px solid var(--gold); background: linear-gradient(to right, #fffdfa, #ffffff); }
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .badge-date { background: #0f172a; color: white; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-    .badge-gold { background: var(--gold); color: white; padding: 3px 6px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; }
-    
-    .athlete-banner {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-      font-size: 0.98rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-    .sport-emoji {
-      font-size: 1.25rem;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--primary-light);
-      border-radius: 8px;
-    }
-    .event-meta { font-size: 0.82rem; color: var(--subtext); margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
-    .venue-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      color: #0284c7;
-      text-decoration: none;
-      font-weight: 600;
-      background: #f0f9ff;
-      padding: 3px 8px;
-      border-radius: 6px;
-      margin-top: 2px;
-      align-self: flex-start;
-    }
-    .focus-box {
-      background: #f0fdf4;
-      color: #15803d;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .transit-box {
-      background: #f8fafc;
-      border-left: 3px solid #64748b;
-      padding: 8px 10px;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      color: #334155;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-    .price-tag {
-      text-align: right;
-      font-size: 0.92rem;
-      font-weight: 800;
-      color: #dc2626;
-    }
-
-    .transit-hub-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-    }
-    .transit-hub-title { font-weight: bold; font-size: 0.95rem; color: var(--primary); margin-bottom: 6px; }
-    .timeline-item { padding: 6px 0 6px 12px; border-left: 2px solid #cbd5e1; position: relative; font-size: 0.8rem; }
-    .timeline-item::before { content: ''; width: 8px; height: 8px; background: #2563eb; border-radius: 50%; position: absolute; left: -5px; top: 10px; }
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: #ffffff;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.72rem;
-      color: #94a3b8;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-    .nav-item.active { color: var(--primary); font-weight: bold; }
-    .nav-icon { font-size: 1.25rem; margin-bottom: 2px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 名古屋亞運賽程助手</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-12">
 
-<header>
-  <div class="header-title">
-    <span>🏆 AICHI-NAGOYA 2026</span>
-    <span style="font-size: 0.8rem; font-weight: normal; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px;">中華隊加油</span>
-  </div>
-  <div class="header-sub">亞運焦點選手・地圖直達・交通轉乘速查</div>
-</header>
-
-<!-- TAB 1: 賽事查詢 -->
-<div id="viewSchedule" class="view-content active">
-  <div class="controls">
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜球星、項目、日期 (如: 林昱珉、鄒子羲、許育修、Shigekix)...">
-    
-    <div class="tags-slider" id="tagsList">
-      <div class="chip active" onclick="setFilter('全部')">全部</div>
-      <div class="chip" onclick="setFilter('棒球')">⚾ 棒球</div>
-      <div class="chip" onclick="setFilter('3x3')">🏀 3x3 籃球</div>
-      <div class="chip" onclick="setFilter('體操')">🤸‍♂️ 體操</div>
-      <div class="chip" onclick="setFilter('柔道')">🥋 柔道</div>
-      <div class="chip" onclick="setFilter('網球')">🎾 網球</div>
-      <div class="chip" onclick="setFilter('攀岩')">🧗 攀岩</div>
-      <div class="chip" onclick="setFilter('拳擊')">🥊 拳擊</div>
-      <div class="chip" onclick="setFilter('霹靂舞')">🕺 霹靂舞</div>
-    </div>
-
-    <div class="price-switch">
-      <span>試算票價模式：</span>
-      <div class="switch-btn-group">
-        <button class="switch-btn active" id="pBtn1" onclick="setPerson(1)">單人</button>
-        <button class="switch-btn" id="pBtn2" onclick="setPerson(2)">雙人</button>
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <h1 class="text-lg font-bold">2026 名古屋亞運焦點賽程</h1>
+        <p class="text-xs text-blue-200">中華隊精選賽事 ＆ 即時導航</p>
       </div>
+      <span class="text-xs bg-blue-700 px-2 py-1 rounded-full border border-blue-500">LIFF 專用版</span>
+    </div>
+  </header>
+
+  <!-- 篩選器按鈕區 -->
+  <div class="max-w-xl mx-auto px-4 mt-4">
+    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-medium">
+      <button onclick="filterSchedule('ALL')" class="filter-btn px-3 py-1.5 rounded-full bg-blue-900 text-white shadow-sm shrink-0">全部賽程</button>
+      <button onclick="filterSchedule('五人制男籃')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">五人男籃</button>
+      <button onclick="filterSchedule('3x3')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">3x3男籃</button>
+      <button onclick="filterSchedule('棒球')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">棒球</button>
+      <button onclick="filterSchedule('體操')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">競技體操</button>
+      <button onclick="filterSchedule('柔道')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">柔道</button>
+      <button onclick="filterSchedule('網球')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">網球</button>
+      <button onclick="filterSchedule('攀登')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">運動攀登</button>
+      <button onclick="filterSchedule('霹靂舞')" class="filter-btn px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-sm shrink-0">霹靂舞</button>
     </div>
   </div>
 
-  <div id="eventList"></div>
-</div>
+  <!-- 賽程卡片渲染清單 -->
+  <main class="max-w-xl mx-auto px-4 mt-3">
+    <div id="scheduleList" class="space-y-3">
+      <!-- JavaScript 會動態插入卡片 -->
+    </div>
+  </main>
 
-<!-- TAB 2: 轉乘交通錦囊 -->
-<div id="viewTransit" class="view-content">
-  <div class="transit-hub-card">
-    <div class="transit-hub-title">🚅 名古屋 ⇄ 豐橋市民球場 (棒球金牌戰)</div>
-    <div class="timeline-item"><strong>方案 A (省時新幹線)：</strong>搭乘 JR 東海道新幹線（約 20 分鐘）直達豐橋站。</div>
-    <div class="timeline-item"><strong>方案 B (高 CP 值)：</strong>搭乘 JR 東海道本線「新快速」（約 50 分鐘，車資約 ¥1,170）。</div>
-    <div class="timeline-item"><strong>抵達豐橋後：</strong>站前轉乘亞運官方免費接駁巴士約 15 分鐘直達球場。</div>
-  </div>
+  <script>
+    // 完整資料庫（不帶選手人名）
+    const scheduleData = [
+      // --- 五人制男籃 (5x5) ---
+      { date: "9/10 (四)", sport: "五人制男籃 (5x5)", time: "13:00 - 15:00", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "分組預賽 G1：中華男籃 vs. 約旦" },
+      { date: "9/12 (六)", sport: "五人制男籃 (5x5)", time: "10:00 - 12:00", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "分組預賽 G2：中華男籃 vs. 伊朗" },
+      { date: "9/13 (日)", sport: "五人制男籃 (5x5)", time: "13:00 - 15:00", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "分組預賽 G3：中華男籃 vs. 卡達 (搶八強門票)" },
+      { date: "9/16 (三)", sport: "五人制男籃 (5x5)", time: "19:20 - 21:30", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "🔥 男籃八強生死戰：中華台北 vs. 地主日本隊！" },
+      { date: "9/18 (五)", sport: "五人制男籃 (5x5)", time: "19:20 - 21:30", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "🔥 男籃四強準決賽：爭奪金牌戰門票！" },
+      { date: "9/20 (日)", sport: "五人制男籃 (5x5) 🥉", time: "16:40 - 18:40", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "🔥 男籃季軍銅牌戰" },
+      { date: "9/20 (日)", sport: "五人制男籃 (5x5) 🥇", time: "19:40 - 21:40", venue: "愛知國際競技場", sub: "中華男籃代表隊 🏀", focus: "🔥 亞運男籃金牌大決戰 暨頒獎典禮！" },
 
-  <div class="transit-hub-card">
-    <div class="transit-hub-title">🚇 名古屋 ⇄ 金城埠頭 (3x3 籃球、攀岩)</div>
-    <div class="timeline-item">於「名古屋站」搭乘<strong>青波線 (Aonami Line)</strong>。</div>
-    <div class="timeline-item">車程約 24 分鐘直達終點站「金城埠頭站」，出站步行即可抵達海港戶外球場與展示館。</div>
-  </div>
+      // --- 三人制男籃 (3x3) ---
+      { date: "9/21 (一)", sport: "籃球 3x3 (BK301)", time: "12:00 - 15:20", venue: "金城埠頭廣場", sub: "中華 3x3 男籃 🏀", focus: "男籃分組預賽 第 1 輪 (搶首勝)" },
+      { date: "9/22 (二)", sport: "籃球 3x3 (BK304)", time: "17:40 - 21:00", venue: "金城埠頭廣場", sub: "中華 3x3 男籃 🏀", focus: "男籃分組預賽 第 4 輪 (夜戰外線火力對決)" },
+      { date: "9/23 (三)", sport: "籃球 3x3 (BK305)", time: "12:00 - 15:20", venue: "金城埠頭廣場", sub: "中華 3x3 男籃 🏀", focus: "男籃分組預賽 第 5 輪 (力拚小組第一種子)" },
+      { date: "9/24 (四)", sport: "籃球 3x3 (BK307)", time: "12:00 - 15:20", venue: "金城埠頭廣場", sub: "中華 3x3 男籃 🏀", focus: "男籃八強資格淘汰賽 (爭四強席次)" },
+      { date: "9/25 (五)", sport: "籃球 3x3 (BK309) 🥇", time: "13:00 - 15:30", venue: "金城埠頭廣場", sub: "中華 3x3 男籃 🏀", focus: "🔥 3x3 男籃四強準決賽 ＆ 金牌大決戰！" },
 
-  <div class="transit-hub-card">
-    <div class="transit-hub-title">🥋 名古屋 ⇄ 愛知國際競技場 (IG Arena 柔道)</div>
-    <div class="timeline-item">搭乘地下鐵<strong>名城線</strong>直達「名城公園站」。</div>
-    <div class="timeline-item">2 號出口出站直通全新 IG Arena 體育館，免日曬雨淋。</div>
-  </div>
+      // --- 棒球 ---
+      { date: "9/21 (一)", sport: "棒球 (BBL03)", time: "18:30 - 21:30", venue: "岡崎中央綜合公園棒球場", sub: "中華成棒代表隊 ⚾", focus: "🔥 台韓大戰！世仇前哨戰首戰" },
+      { date: "9/22 (二)", sport: "棒球 (BBL06)", time: "12:00 - 15:00", venue: "豐橋市民球場", sub: "中華成棒代表隊 ⚾", focus: "中華台北 vs. 泰國 (分組循環賽)" },
+      { date: "9/23 (三)", sport: "棒球 (BBL12)", time: "18:30 - 21:30", venue: "豐橋市立棒球場", sub: "中華成棒代表隊 ⚾", focus: "中華台北 vs. 中國香港 (預賽調整衝刺)" },
+      { date: "9/25 (五)", sport: "棒球 (BBL15/16)", time: "18:30 - 21:30", venue: "岡崎中央綜合公園棒球場", sub: "中華成棒代表隊 ⚾", focus: "🔥 超級循環賽 Super Round (爭金牌戰門票)" },
+      { date: "9/26 (六)", sport: "棒球 (BBL19/20)", time: "18:30 - 21:30", venue: "豐橋市立棒球場", sub: "中華成棒代表隊 ⚾", focus: "🔥 超級循環賽次日 (鎖定決賽名額)" },
+      { date: "9/27 (日)", sport: "棒球 (BBL22) 🥇", time: "18:30 - 22:30", venue: "豐橋市立棒球場", sub: "中華成棒代表隊 ⚾", focus: "🔥 亞運棒球金牌大決戰 暨頒獎典禮！" },
 
-  <div class="transit-hub-card">
-    <div class="transit-hub-title">🎾 名古屋 ⇄ 東山公園網球中心</div>
-    <div class="timeline-item">市區搭地下鐵東山線至「本山站」，轉名城線至<strong>「八事日赤站」</strong>。</div>
-    <div class="timeline-item">出站步行約 15 分鐘即可抵達網球中心。</div>
-  </div>
+      // --- 競技體操 (鞍馬決賽 + 單槓決賽) ---
+      { date: "9/24 (四)", sport: "競技體操 (鞍馬決賽) 🥇", time: "17:00 - 21:35", venue: "名古屋市綜合體育館【彩虹館】", sub: "中華競技體操代表隊 🤸‍♂️", focus: "🔥 男子鞍馬個人單項金牌大決賽！" },
+      { date: "9/25 (五)", sport: "競技體操 (單槓決賽) 🥇", time: "15:00 - 19:35", venue: "名古屋市綜合體育館【彩虹館】", sub: "中華競技體操代表隊 🤸‍♂️", focus: "🔥 男子單槓個人單項金牌大決賽！(門票 15,000 日圓)" },
 
-  <div class="transit-hub-card">
-    <div class="transit-hub-title">🕺 名古屋 ⇄ 愛知 Sky Expo (霹靂舞)</div>
-    <div class="timeline-item">於「名鐵名古屋站」搭乘<strong>名鐵特急 μ-SKY</strong> 約 28～35 分鐘。</div>
-    <div class="timeline-item">抵達「中部國際空港站」，走室內連通道步行 5 分鐘直達 Sky Expo。</div>
-  </div>
-</div>
+      // --- 柔道 ---
+      { date: "9/30 (三)", sport: "柔道 (JUD02) 🥇", time: "17:00 - 19:30", venue: "愛知國際競技場", sub: "中華柔道代表隊 🥋", focus: "🔥 男子 60kg 級金牌衛冕大決賽！" },
+      { date: "10/1 (四)", sport: "柔道 (JUD04) 🥇", time: "17:00 - 19:30", venue: "愛知國際競技場", sub: "中華柔道代表隊 🥋", focus: "🔥 女子 57kg 級金牌衛冕大決賽！" },
+      { date: "10/3 (六)", sport: "柔道 (JUD08) 🥇", time: "17:00 - 19:30", venue: "愛知國際競技場", sub: "中華柔道代表隊 🥋", focus: "🔥 男女混合團體金牌大決賽" },
 
-<!-- 底部導航欄 -->
-<div class="bottom-nav">
-  <button class="nav-item active" id="tabSchedule" onclick="switchTab('viewSchedule', 'tabSchedule')">
-    <div class="nav-icon">📅</div>
-    <div>賽程查詢</div>
-  </button>
-  <button class="nav-item" id="tabTransit" onclick="switchTab('viewTransit', 'tabTransit')">
-    <div class="nav-icon">🚆</div>
-    <div>交通轉乘</div>
-  </button>
-</div>
+      // --- 網球 ---
+      { date: "9/28 (一)", sport: "網球 (TEN02)", time: "10:00 - 21:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "男單第 2 輪 / 雙打第 1、2 輪" },
+      { date: "9/29 (二)", sport: "網球 (TEN03)", time: "10:00 - 21:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "男雙第 3 輪 (卡位晉級八強)" },
+      { date: "9/30 (三)", sport: "網球 (TEN04)", time: "10:00 - 21:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "雙打八強卡位戰 (爭進四強獎牌區)" },
+      { date: "10/1 (四)", sport: "網球 (TEN05) 🥉", time: "10:00 - 17:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "🔥 男雙四強準決賽 (晉級保底銅牌、搶進金牌戰！)" },
+      { date: "10/2 (五)", sport: "網球 (TEN06) 🥇", time: "10:00 - 16:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "🔥 中華男雙金牌大決戰 暨頒獎典禮！" },
+      { date: "10/3 (六)", sport: "網球 (TEN07) 🥇", time: "10:00 - 21:00", venue: "東山公園網球中心", sub: "中華網球代表隊 🎾", focus: "🔥 網球壓軸日（男單/女雙/混雙三金大決賽）" },
 
-<script>
-const events = [
-  { d: "9/21 (一)", s: "3x3 籃球", code: "BK301", t: "12:00 - 15:20", loc: "金城埠頭廣場", focus: "男女分組賽 第一輪", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "往岡崎(棒球)：青波線回名古屋(24分) ➔ 名鐵特急至東岡崎(30分) ➔ 接駁車。車程約 80 分。", athlete: "鄒子羲 🏀 3x3 搶首勝", emoji: "🏀" },
-  { d: "9/21 (一)", s: "棒球", code: "BBL03", t: "18:30 - 21:30", loc: "岡崎中央綜合公園棒球場", focus: "🔥 台韓大戰！首輪宿敵焦點大戰", g: false, p1: 5000, p2: 10000, seat: "Cat A", tr: "下午 3x3 完賽接續此場，時間充裕。", athlete: "林昱珉 ⚾ 壓制韓國強打", emoji: "⚾" },
-  { d: "9/22 (二)", s: "棒球", code: "BBL06", t: "12:00 - 15:00", loc: "豐橋市民球場", focus: "中華台北 vs 泰國 (穩抓分組戰績)", g: false, p1: 5000, p2: 10000, seat: "Cat A", tr: "往金城埠頭：豐橋搭新幹線(20分)或JR新快速(50分)至名古屋 ➔ 轉青波線。", athlete: "中華成棒隊 (林昱珉壓陣) ⚾", emoji: "⚾" },
-  { d: "9/22 (二)", s: "3x3 籃球", code: "BK304", t: "17:40 - 21:00", loc: "金城埠頭廣場", focus: "男女分組賽 第四輪 (夜間高張力戰)", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "搭新幹線可在 16:40 前抵達金城埠頭海港球場。", athlete: "鄒子羲 🏀 外線火力火力支援", emoji: "🏀" },
-  { d: "9/23 (三)", s: "3x3 籃球", code: "BK305", t: "12:00 - 15:20", loc: "金城埠頭廣場", focus: "男女分組賽 第五輪 (關鍵晉級賽)", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "往豐橋：青波線至名古屋 ➔ JR新快速至豐橋 ➔ 接駁公車(約85分)。", athlete: "鄒子羲 🏀 拚分組第一", emoji: "🏀" },
-  { d: "9/23 (三)", s: "棒球", code: "BBL12", t: "18:30 - 21:30", loc: "豐橋市立棒球場", focus: "中華台北 vs 中國香港 (預賽最後調整)", g: false, p1: 5000, p2: 10000, seat: "Cat A", tr: "空檔超過 3 小時，可在豐橋站享用美食。", athlete: "中華成棒隊 (林昱珉備戰) ⚾", emoji: "⚾" },
-  { d: "9/24 (四)", s: "3x3 籃球", code: "BK307", t: "12:00 - 15:20", loc: "金城埠頭廣場", focus: "男女資格晉級淘汰賽", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "往彩虹館(體操)：青波線至名古屋 ➔ 轉 JR 東海道本線至「笠寺站」(11分)。", athlete: "鄒子羲 🏀 晉級淘汰賽", emoji: "🏀" },
-  { d: "9/24 (四)", s: "競技體操", code: "GYM05", t: "17:00 - 21:35", loc: "名古屋市綜合體育館 (彩虹館)", focus: "🔥 李智凱鞍馬決賽！衝擊金牌衛冕！", g: true, p1: 15000, p2: 30000, seat: "頂級席", tr: "笠寺站天橋直通彩虹館，出站 3 分鐘即可入場就座。", athlete: "李智凱 🤸‍♂️ 鞍馬衝金", emoji: "🤸‍♂️" },
-  { d: "9/25 (五)", s: "3x3 籃球", code: "BK309", t: "13:00 - 15:30", loc: "金城埠頭廣場", focus: "🔥 男女四強準決賽 ＆ 金牌大決戰！", g: true, p1: 4000, p2: 8000, seat: "Cat A", tr: "往棒球四強：青波線至名古屋 ➔ 轉名鐵去東岡崎或JR去豐橋(約80分)。", athlete: "鄒子羲 🏀 爭奪金牌戰", emoji: "🏀" },
-  { d: "9/25 (五)", s: "棒球", code: "BBL15/16", t: "18:30 - 21:30", loc: "岡崎 / 豐橋", focus: "🔥 超級循環賽 Super Round (爭金牌門票)", g: false, p1: 8500, p2: 17000, seat: "Cat A(預估)", tr: "15:30 下午籃球完賽直奔球場，銜接順暢！", athlete: "林昱珉 ⚾ 領銜四強主投", emoji: "⚾" },
-  { d: "9/26 (六)", s: "棒球", code: "BBL19/20", t: "18:30 - 21:30", loc: "岡崎 / 豐橋", focus: "🔥 超級循環賽次日 (鎖定決賽名額)", g: false, p1: 8500, p2: 17000, seat: "Cat A(預估)", tr: "市區名鐵直達東岡崎(30分)或新快速至豐橋(50分)。", athlete: "中華代表隊 (林昱珉坐鎮) ⚾", emoji: "⚾" },
-  { d: "9/27 (日)", s: "棒球", code: "BBL22", t: "18:30 - 22:30", loc: "豐橋市立棒球場", focus: "🔥 亞運棒球金牌大決戰 暨頒獎典禮", g: true, p1: 8500, p2: 17000, seat: "Cat A", tr: "名古屋站搭 JR 新快速直達豐橋(50分)或新幹線(20分)。", athlete: "林昱珉 ⚾ 冠軍戰王牌登板！", emoji: "⚾" },
-  { d: "9/28 (一)", s: "網球", code: "TEN02", t: "10:00 - 21:00", loc: "東山公園網球中心", focus: "男單第 2 輪 / 雙打第 1、2 輪", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "地下鐵名城線「八事日赤站」，步行約15分鐘。", athlete: "許育修 / 黃琮豪 🎾 男雙首輪", emoji: "🎾" },
-  { d: "9/29 (二)", s: "運動攀登", code: "CLB01", t: "10:00 - 13:15", loc: "名古屋國際展示場 1 館", focus: "男子抱石準決賽 / 速度資格賽", g: false, p1: 3500, p2: 7000, seat: "Cat A", tr: "往網球：青波線至名古屋 ➔ 東山線至本山 ➔ 名城線至八事日赤(55分)。", athlete: "伍鵬 速度攀岩 🧗", emoji: "🧗" },
-  { d: "9/29 (二)", s: "網球", code: "TEN03", t: "10:00 - 21:00", loc: "東山公園網球中心", focus: "男雙第 3 輪 (卡位晉級八強)", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "下午約 14:30 抵達網球中心看焦點雙打。", athlete: "許育修 / 黃琮豪 🎾 金牌雙打組合", emoji: "🎾" },
-  { d: "9/30 (三)", s: "運動攀登", code: "CLB02", t: "10:00 - 13:15", loc: "名古屋國際展示場 1 館", focus: "男子速度攀岩資格賽", g: false, p1: 3500, p2: 7000, seat: "Cat A", tr: "往柔道：青波線至名古屋 ➔ 地下鐵至「名城公園站」(45分)。", athlete: "伍鵬 速度攀登 🧗", emoji: "🧗" },
-  { d: "9/30 (三)", s: "網球", code: "TEN04", t: "10:00 - 21:00", loc: "東山公園網球中心", focus: "雙打八強卡位戰 (爭進四強獎牌區)", g: false, p1: 4000, p2: 8000, seat: "Cat A", tr: "往柔道：八事日赤站搭名城線直達「名城公園站」(25分)。", athlete: "許育修 / 黃琮豪 🎾 爭進準決賽", emoji: "🎾" },
-  { d: "9/30 (三)", s: "柔道", code: "JUD02", t: "17:00 - 19:30", loc: "愛知國際競技場 (IG Arena)", focus: "🔥 楊勇緯男子 60kg 金牌衛冕決賽！", g: true, p1: 25000, p2: 50000, seat: "Cat AA", tr: "地下鐵名城線「名城公園站」2號出口直達場館。", athlete: "楊勇緯 🥋 柔道男神衝金", emoji: "🥋" },
-  { d: "10/1 (四)", s: "網球", code: "TEN05", t: "10:00 - 17:00", loc: "東山公園網球中心", focus: "🔥 男雙四強準決賽（晉級保底銅牌、搶進金牌戰！）", g: true, p1: 4000, p2: 8000, seat: "Cat A", tr: "往攀岩：地鐵回名古屋站 ➔ 轉青波線至金城埠頭(55分)。", athlete: "許育修 / 黃琮豪 🎾 爭金牌戰門票", emoji: "🎾" },
-  { d: "10/1 (四)", s: "柔道", code: "JUD04", t: "17:00 - 19:30", loc: "愛知國際競技場", focus: "🔥 連珍羚女子 57kg 衛冕衝金！", g: true, p1: 25000, p2: 50000, seat: "Cat AA", tr: "東山公園搭名城線直達名城公園站僅需 25 分鐘。", athlete: "連珍羚 🥋 柔道女王", emoji: "🥋" },
-  { d: "10/1 (四)", s: "運動攀登", code: "CLB04", t: "18:00 - 21:05", loc: "名古屋國際展示場 1 館", focus: "🔥 伍鵬男子速度攀岩金牌大決戰！", g: true, p1: 7000, p2: 14000, seat: "Cat A", tr: "網球四強約 16:30 結束，轉車約 17:35 即可進場看決賽。", athlete: "伍鵬 🧗 4秒台飛人", emoji: "🧗" },
-  { d: "10/2 (五)", s: "網球", code: "TEN06", t: "10:00 - 16:00", loc: "東山公園網球中心", focus: "🔥 中華網球男雙金牌大決戰 暨頒獎典禮！", g: true, p1: 12000, p2: 24000, seat: "Cat A(預估)", tr: "下午可轉名鐵西尾線(70分)去拳擊，或名鐵特急(50分)去常滑霹靂舞。", athlete: "許育修 / 黃琮豪 🎾 衛冕男雙金牌！", emoji: "🎾" },
-  { d: "10/2 (五)", s: "拳擊", code: "BOX20", t: "17:30 - 19:45", loc: "西尾市體育館", focus: "🔥 黃筱雯女子 54kg 金牌衝刺戰！", g: true, p1: 4000, p2: 8000, seat: "Cat A", tr: "名鐵「西尾站」轉接駁公車至體育館。", athlete: "黃筱雯 🥊 拳擊衝金", emoji: "🥊" },
-  { d: "10/2 (五)", s: "霹靂舞", code: "BKG01", t: "下午至晚間", loc: "愛知 Sky Expo (常滑)", focus: "🔥 孫振 vs. Shigekix 台日頂尖十六強資格戰！", g: false, p1: 0, p2: 0, seat: "待轉售", tr: "名鐵「中部國際空港站」步行 5 分鐘直達。", athlete: "孫振 vs. Shigekix 🕺 Breaking", emoji: "🕺" },
-  { d: "10/3 (六)", s: "網球", code: "TEN07", t: "10:00 - 21:00", loc: "東山公園網球中心", focus: "🔥 網球壓軸日（男單/女雙/混雙三金決賽）", g: true, p1: 12000, p2: 24000, seat: "Cat A", tr: "往名城公園(柔道)約 25 分；往常滑(霹靂舞)約 50 分。", athlete: "許育修 / 黃琮豪 🎾 頒獎與壓軸日", emoji: "🎾" },
-  { d: "10/3 (六)", s: "柔道", code: "JUD08", t: "17:00 - 19:30", loc: "愛知國際競技場", focus: "🔥 男女混合團體金牌大決賽", g: true, p1: 25000, p2: 50000, seat: "Cat AA", tr: "名城線直達，無縫切換。", athlete: "中華柔道男女代表隊 🥋", emoji: "🥋" },
-  { d: "10/3 (六)", s: "運動攀登", code: "CLB06", t: "18:00 - 20:35", loc: "名古屋國際展示場 1 館", focus: "男女難度攀岩金牌決賽", g: true, p1: 7000, p2: 14000, seat: "Cat A", tr: "東山公園網球轉金城埠頭約 55 分鐘。", athlete: "運動攀登頂尖高手 🧗", emoji: "🧗" },
-  { d: "10/3 (六)", s: "霹靂舞", code: "BKG02", t: "晚間", loc: "愛知 Sky Expo (常滑)", focus: "🔥 孫振 ＆ Shigekix 終極金牌大決戰！", g: true, p1: 0, p2: 0, seat: "待轉售", tr: "網球傍晚轉名鐵特急約 50 分鐘直奔常滑。", athlete: "孫振 vs. Shigekix 🕺🥇 金牌大決鬥", emoji: "🕺" }
-];
+      // --- 運動攀登 ---
+      { date: "9/29 (二)", sport: "運動攀登 (CLB01)", time: "10:00 - 13:15", venue: "名古屋國際展示場", sub: "中華攀登代表隊 🧗", focus: "男子抱石準決賽 / 速度資格賽" },
+      { date: "9/30 (三)", sport: "運動攀登 (CLB02)", time: "10:00 - 13:15", venue: "名古屋國際展示場", sub: "中華攀登代表隊 🧗", focus: "男子速度攀岩預賽" },
+      { date: "10/1 (四)", sport: "運動攀登 (CLB04) 🥇", time: "18:00 - 21:05", venue: "名古屋國際展示場", sub: "中華攀登代表隊 🧗", focus: "🔥 男子速度攀登金牌大決戰！" },
 
-let currentPerson = 1;
-let currentSport = '全部';
+      // --- 拳擊 ---
+      { date: "10/2 (五)", sport: "拳擊 (BOX20) 🥇", time: "17:30 - 19:45", venue: "西尾市體育館", sub: "中華拳擊代表隊 🥊", focus: "🔥 女子 54kg 級金牌衝刺戰！" },
 
-function render() {
-  const container = document.getElementById('eventList');
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  container.innerHTML = '';
+      // --- 霹靂舞 ---
+      { date: "10/2 (五)", sport: "霹靂舞 (BKG01)", time: "下午至晚間", venue: "Aichi Sky Expo", sub: "中華霹靂舞代表隊 🕺", focus: "🔥 頂尖十六強小組資格循環戰！" },
+      { date: "10/3 (六)", sport: "霹靂舞 (BKG02) 🥇", time: "晚間", venue: "Aichi Sky Expo", sub: "中華霹靂舞代表隊 🕺", focus: "🔥 終極八強淘汰賽 ＆ 金牌大決戰！" }
+    ];
 
-  const list = events.filter(e => {
-    const matchSport = currentSport === '全部' || e.s.includes(currentSport);
-    const matchQuery = (e.s + e.code + e.loc + e.focus + e.athlete + e.d).toLowerCase().includes(q);
-    return matchSport && matchQuery;
-  });
-
-  list.forEach(e => {
-    const card = document.createElement('div');
-    card.className = `card ${e.g ? 'gold-border' : ''}`;
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.loc)}`;
-
-    let priceStr = "";
-    if (e.p1 === 0) {
-      priceStr = "售罄 (待收轉售票)";
-    } else {
-      const p = currentPerson === 1 ? e.p1 : e.p2;
-      priceStr = `${currentPerson === 1 ? '單人' : '雙人'}：¥${p.toLocaleString()} (${e.seat})`;
+    function renderList(items) {
+      const container = document.getElementById("scheduleList");
+      container.innerHTML = "";
+      
+      items.forEach(item => {
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.venue)}`;
+        const card = `
+          <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+              <span class="text-xs font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded">${item.date}</span>
+              <span class="text-xs font-semibold text-slate-500">${item.sport}</span>
+            </div>
+            <div class="mt-2">
+              <h3 class="font-bold text-slate-800 text-sm">${item.sub}</h3>
+              <p class="text-xs text-slate-500 mt-0.5">🕒 ${item.time}</p>
+              <p class="text-xs text-slate-500">📍 ${item.venue}</p>
+              <p class="text-xs font-semibold text-emerald-700 mt-1.5">${item.focus}</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex justify-end">
+              <a href="${mapUrl}" target="_blank" class="inline-flex items-center text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 px-3 py-1.5 rounded-lg transition-colors">
+                📍 開啟導航
+              </a>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML("beforeend", card);
+      });
     }
 
-    card.innerHTML = `
-      <div class="card-top">
-        <span class="badge-date">${e.d}</span>
-        ${e.g ? '<span class="badge-gold">🥇 獎牌決賽</span>' : '<span style="font-size:0.75rem;color:#64748b;font-weight:600;">' + e.code + '</span>'}
-      </div>
+    function filterSchedule(category) {
+      // 變換按鈕樣式
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("bg-blue-900", "text-white");
+        btn.classList.add("bg-white", "text-slate-700");
+      });
+      event.target.classList.add("bg-blue-900", "text-white");
+      event.target.classList.remove("bg-white", "text-slate-700");
+
+      if (category === "ALL") {
+        renderList(scheduleData);
+      } else {
+        const filtered = scheduleData.filter(item => 
+          item.sport.includes(category) || item.focus.includes(category)
+        );
+        renderList(filtered);
+      }
+    }
+
+    // 頁面加載完成時初始化
+    window.addEventListener("DOMContentLoaded", () => {
+      renderList(scheduleData);
       
-      <div class="athlete-banner">
-        <div class="sport-emoji">${e.emoji}</div>
-        <div>${e.athlete}</div>
-      </div>
-
-      <div class="event-meta">
-        <div>🕒 <strong>${e.t}</strong></div>
-        <div>
-          📍 ${e.loc} 
-          <a class="venue-link" href="${mapUrl}" target="_blank">導航 ↗</a>
-        </div>
-      </div>
-
-      <div class="focus-box">${e.focus}</div>
-      <div class="transit-box">🚆 <strong>轉乘動線：</strong>${e.tr}</div>
-      <div class="price-tag">${priceStr}</div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-function setFilter(sport) {
-  currentSport = sport;
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.innerText.includes(sport));
-  });
-  render();
-}
-
-function setPerson(num) {
-  currentPerson = num;
-  document.getElementById('pBtn1').classList.toggle('active', num === 1);
-  document.getElementById('pBtn2').classList.toggle('active', num === 2);
-  render();
-}
-
-function switchTab(viewId, tabId) {
-  document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  
-  document.getElementById(viewId).classList.add('active');
-  document.getElementById(tabId).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-document.getElementById('searchInput').addEventListener('input', render);
-render();
-</script>
-
+      // 初始化 LINE LIFF（若有設定 LIFF ID 可填入，非強制）
+      if (typeof liff !== "undefined") {
+        liff.init({ liffId: "你的LIFF_ID" }).catch(err => {
+          console.log("LIFF Init error:", err);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
